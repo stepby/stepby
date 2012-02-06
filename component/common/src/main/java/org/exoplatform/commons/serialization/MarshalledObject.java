@@ -18,7 +18,13 @@
  */
 package org.exoplatform.commons.serialization;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.Arrays;
+
+import org.gatein.common.io.IOTools;
+import org.gatein.common.io.UndeclaredIOException;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
@@ -33,5 +39,40 @@ public class MarshalledObject<S extends Serializable> {
 	public MarshalledObject(ClassLoader loader, byte[] state) {
 		this.loader = loader;
 		this.state = state;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == this) return true;
+		else if(obj instanceof MarshalledObject) {
+			MarshalledObject<?> that = (MarshalledObject<?>)obj;
+			return Arrays.equals(that.state, state);
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(state);
+	}
+	
+	public static <S extends Serializable>  MarshalledObject<S> marshall(S serializable) {
+		if(serializable == null) throw new NullPointerException();
+		try {
+			byte[] bytes = IOTools.serialize(serializable);
+			return new MarshalledObject<S>(serializable.getClass().getClassLoader(), bytes);
+		} catch(IOException e) {
+			throw new UndeclaredIOException(e);
+		}
+	}
+	
+	public S unmarshall() throws UndeclaredThrowableException {
+		try {
+			return (S)IOTools.unserialize(state, loader);
+		} catch(IOException e) {
+			throw new UndeclaredIOException(e);
+		} catch(ClassNotFoundException e) {
+			throw new UndeclaredThrowableException(e);
+		}
 	}
 }
