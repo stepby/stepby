@@ -36,7 +36,7 @@ public final class FieldModel<O, V> {
 	
 	private boolean _transient;	
 	
-	FieldModel(TypeModel<O> owner, Field field, TypeModel<O> type) {
+	FieldModel(TypeModel<O> owner, Field field, TypeModel<V> type) {
 		this.owner = owner;
 		this.field = field;
 		this.type = type;
@@ -55,6 +55,10 @@ public final class FieldModel<O, V> {
 		return field.getName();
 	}
 	
+	public boolean isTransient() {
+		return _transient;
+	}
+	
 	public V get(Object o) {
 		try {
 			Object value = field.get(o);
@@ -68,5 +72,23 @@ public final class FieldModel<O, V> {
 		} catch(IllegalAccessException e) {
 			throw new AssertionError(e);
 		}
+	}
+	
+	public void set(Object o, V value) {
+		try {
+			field.set(o, value);
+		} catch (IllegalAccessException e) {
+			throw new AssertionError(e);
+		}
+	}
+	
+	public void castAndSet(Object o, Object value) {
+		V v = type.getJavaType().cast(o);
+		set(o, v);
+	}
+	
+	@Override
+	public String toString() {
+		return "FieldName=[name = " + field.getName() + ", owner = " + owner + "]";
 	}
 }

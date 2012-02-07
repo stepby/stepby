@@ -26,12 +26,12 @@ package org.exoplatform.commons.serialization.api;
 public class DefaultTypeConverter<O> extends TypeConverter<O, O>{
 
 	@Override
-	public O write(O external) throws Exception {
-		return external;
+	public O write(O inputClass) throws Exception {
+		return inputClass;
 	}
 
 	@Override
-	public O read(O internal) throws Exception {
-		return internal;
+	public O read(O outputClass) throws Exception {
+		return outputClass;
 	}
 }

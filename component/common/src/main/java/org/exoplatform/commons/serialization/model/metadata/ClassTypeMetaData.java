@@ -16,16 +16,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.commons.serialization.api;
+package org.exoplatform.commons.serialization.model.metadata;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
  * @version $Id$
  *
  */
-public abstract class TypeConverter<I, O> {
-
-	public abstract O write(I inputClass) throws Exception;
+public class ClassTypeMetaData extends TypeMetaData {
 	
-	public abstract I read(O outputClass) throws Exception;
+	private final boolean serialized;
+
+	public ClassTypeMetaData(String name, boolean serialized) {
+		super(name);
+		this.serialized = serialized;
+	}
+	
+	public boolean isSerialized() {
+		return serialized;
+	}
+	
+	@Override
+	public String toString() {
+		return "ClassTypeMetaData[name=" + name + ", serialized=" + serialized + "]";
+	}
 }

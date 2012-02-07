@@ -18,11 +18,47 @@
  */
 package org.exoplatform.commons.serialization.model;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
  * @version $Id$
  *
  */
 public class ClassTypeModel<O> extends TypeModel<O> {
+	
+	private final ClassTypeModel<? super O> superType;
+	
+	private final Map<String, FieldModel<O, ?>> fields;
+	
+	private final Map<String, FieldModel<O, ?>> immutableFields;
+	
+	private final SerializationMode serializationMode;
 
+	ClassTypeModel(Class<O> javaType, ClassTypeModel<? super O> superType, Map<String, FieldModel<O, ?>> fields, SerializationMode serializationMode) {
+		super(javaType, superType);
+		this.superType = superType;
+		this.fields = fields;
+		this.immutableFields = Collections.unmodifiableMap(fields);
+		this.serializationMode = serializationMode;
+	}
+	
+	@Override
+	public ClassTypeModel<? super O> getSuperType() {
+		return superType;
+	}
+	
+	public SerializationMode getSerializationMode() {
+		return serializationMode;
+	}
+	
+	public Collection<FieldModel<O, ?>> getFields() {
+		return immutableFields.values();
+	}
+	
+	public Map<String, FieldModel<O, ?>> getFieldMap() {
+		return immutableFields;
+	}
 }
