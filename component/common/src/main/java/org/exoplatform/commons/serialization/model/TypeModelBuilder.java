@@ -18,10 +18,13 @@
  */
 package org.exoplatform.commons.serialization.model;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.exoplatform.commons.serialization.api.TypeConverter;
 import org.exoplatform.commons.serialization.api.annotations.Converted;
@@ -72,26 +75,81 @@ class TypeModelBuilder {
 	
 	private <O> ClassTypeModel<O> buildClassType(Class<O> javaType, ClassTypeMetaData typeMetaData) {
 		ClassTypeModel<? super O> superTypeModel = null;
+		
 		if(javaType.getSuperclass() != null) {
-//			TypeModel<? super O> buildType = bui
+			TypeModel<? super O> buildType = build(javaType.getSuperclass());
+			if(buildType instanceof ClassTypeModel) {
+				superTypeModel = (ClassTypeModel<? super O>) buildType;
+			} else {
+				throw new TypeException();
+			}
 		}
-		return null;
+		
+		TreeMap<String, FieldModel<O, ?>> fieldModels = new TreeMap<String, FieldModel<O,?>>();
+		SerializationMode serializationMode;
+		if(typeMetaData.isSerialized()) {
+			serializationMode = SerializationMode.SERIALIZED;
+		} else if(Serializable.class.isAssignableFrom(javaType)) {
+			serializationMode = SerializationMode.SERIALIZABLE;
+		} else {
+			serializationMode = SerializationMode.NONE;
+		}
+
+		ClassTypeModel<O> typeModel = new ClassTypeModel<O>(javaType, superTypeModel, fieldModels, serializationMode);
+
+		addedTypeModels.put(typeModel.getName(), typeModel);
+
+		for(Field field : javaType.getDeclaredFields()) {
+			if(!Modifier.isStatic(field.getModifiers())) {
+				field.setAccessible(true);
+				Class<?> fieldJavaType = field.getType();
+
+				if(fieldJavaType.isPrimitive()) 
+					fieldJavaType = primitiveToWrapperMap.get(fieldJavaType);
+
+				TypeModel<?> fieldTypeModel = build(fieldJavaType);
+
+				if(fieldTypeModel != null) 
+					fieldModels.put(field.getName(), createField(typeModel, field, fieldTypeModel));
+			}
+		}
+		
+		return typeModel;
 	}
 	
 	private <O, T> ConvertedTypeModel<O, T> buildConvertedType(Class<O> javaType, ConvertedTypeMetaData typeMetaData) {
 		log.debug("About to build type model from type type metadata " + typeMetaData);
 		Class<? extends TypeConverter<?, ?>> converterClass = typeMetaData.getConverterClass();
+		
 		ParameterizedType converterParameterizedType =(ParameterizedType)converterClass.getGenericSuperclass();
+		
 		if(!converterParameterizedType.getActualTypeArguments()[0].equals(javaType)) {
 			throw new TypeException("The declared type parameter in the converter " + converterClass.getName() +
 				" does not match the type it is related to " + javaType.getName());
 		}
+		
 		Class<? extends TypeConverter<O, ?>> converterJavaType = (Class<TypeConverter<O, ?>>)converterClass;
 		return buildConvertedType(javaType, converterJavaType);
 	}
 	
 	private <O, T> ConvertedTypeModel<O, T> buildConvertedType(Class<O> javaType, Class<? extends TypeConverter<O, ?>> converterJavaType) {
-		return null;
+		Class<T> ouputClass = (Class<T>)((ParameterizedType)converterJavaType.getGenericSuperclass()).getActualTypeArguments()[1];
+		ClassTypeModel<T> targetType = (ClassTypeModel<T>)build(ouputClass);
+		
+		TypeModel<? super O> superType = null;
+		Class<? super O> superJavaType = javaType.getSuperclass();
+		if(superJavaType != null) {
+			superType = build(superJavaType);
+		}
+		
+		ConvertedTypeModel<O, T> typeModel = new ConvertedTypeModel<O, T>(
+					javaType, 
+					superType,
+					targetType,
+					(Class<TypeConverter<O, T>>)converterJavaType);
+		addedTypeModels.put(typeModel.getName(), typeModel);
+		
+		return typeModel;
 	}
 	
 	private <O> TypeModel<O> build(Class<O> javaType, TypeMetaData typeMetaData) {

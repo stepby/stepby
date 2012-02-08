@@ -16,19 +16,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.commons.serialization.api.factory;
-
-import java.util.Map;
-
-import org.exoplatform.commons.serialization.model.FieldModel;
-
+package org.exoplatform.commons.serialization.serial;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
  * @version $Id$
- * @param <B> the parameter type of base type
+ *
  */
-public abstract class ObjectFactory<B> {
+class DataKind {
 
-	public abstract <S extends B> S create(Class<S> type, Map<FieldModel<? super S, ?>, ?> state) throws CreateException;
+	public static final int OBJECT = 0;
+	public static final int NULL_VALUE = 1;
+	public static final int OBJECT_REF = 2;
+	public static final int CONVERTED_OBJECT = 3;
+	public static final int SERIALIZED_OBJECT = 4;
 }

@@ -22,13 +22,27 @@ import java.util.Map;
 
 import org.exoplatform.commons.serialization.model.FieldModel;
 
-
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
  * @version $Id$
- * @param <B> the parameter type of base type
+ *
  */
-public abstract class ObjectFactory<B> {
+public class DefaultObjectFactory extends ObjectFactory<Object>{
 
-	public abstract <S extends B> S create(Class<S> type, Map<FieldModel<? super S, ?>, ?> state) throws CreateException;
+	@Override
+	public <S> S create(Class<S> type, Map<FieldModel<? super S, ?>, ?> state) throws CreateException {
+		try {
+			S instance = type.newInstance();
+			
+			for(Map.Entry<FieldModel<? super S, ?>, ?> entry : state.entrySet()) {
+				FieldModel<?, ?> fieldModel = entry.getKey();
+				Object value = entry.getValue();
+				fieldModel.castAndSet(instance, value);
+			}
+			
+			return instance;
+		} catch (Exception e) {
+			throw new CreateException(e);
+		}
+	}
 }

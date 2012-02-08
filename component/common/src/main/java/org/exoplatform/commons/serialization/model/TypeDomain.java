@@ -90,9 +90,30 @@ public class TypeDomain {
 		return typeModelMap.get(name);
 	}
 	
+	public <O> TypeModel<O> getTypeModel(Class<O> javaType) {
+		return get(javaType, buildIfAbsent);
+	}
+	
+	public <O> TypeModel<O> addTypeModel(Class<O> javaType) {
+		return get(javaType, true);
+	}
+	
 	private <O> TypeModel<O> get(Class<O> javaType, boolean create) {
 		if(javaType == null) throw new NullPointerException();
+		
 		TypeModel<O> model = (TypeModel<O>)typeModelMap.get(javaType.getName());
-		return null;
+		
+		if(model == null && create) {
+			synchronized (lock) {
+				TypeModelBuilder builder = new TypeModelBuilder(metaData, immutableTypeModelMap);
+				model = builder.build(javaType);
+				typeModelMap.putAll(builder.getAddedTypeModels());
+			}
+		}
+		return model;
+	}
+	
+	public int getSize() {
+		return typeModelMap.size();
 	}
 }
