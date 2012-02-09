@@ -27,7 +27,7 @@ import java.util.Map;
  * @version $Id$
  *
  */
-public class ClassTypeModel<O> extends TypeModel<O> {
+public final class ClassTypeModel<O> extends TypeModel<O> {
 	
 	private final ClassTypeModel<? super O> superType;
 	

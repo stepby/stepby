@@ -32,7 +32,7 @@ import org.gatein.common.logging.LoggerFactory;
  * @version $Id$
  *
  */
-public class TypeDomain {
+public final class TypeDomain {
 
 	private static final Logger log = LoggerFactory.getLogger(TypeDomain.class);
 	

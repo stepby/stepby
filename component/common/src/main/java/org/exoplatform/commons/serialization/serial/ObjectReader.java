@@ -20,13 +20,17 @@ package org.exoplatform.commons.serialization.serial;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.exoplatform.commons.serialization.SerializationContext;
+import org.exoplatform.commons.serialization.api.factory.ObjectFactory;
+import org.exoplatform.commons.serialization.model.ClassTypeModel;
 import org.exoplatform.commons.serialization.model.FieldModel;
 
 /**
@@ -50,6 +54,51 @@ public class ObjectReader extends ObjectInputStream {
 		this.context = context;
 		this.idToObject = new HashMap<Integer, Object>();
 		this.idToResolutions = new HashMap<Integer, List<FutureFieldUpdate<?>>>();
+	}
+	
+	private <O> O instantiate(ClassTypeModel<O> typeModel, Map<FieldModel<? super O, ?>, ?> state) throws InvalidClassException {
+		try {
+			ObjectFactory<? super O> factory = context.getFactory(typeModel.getJavaType());
+			return factory.create(typeModel.getJavaType(), state);
+		} catch(Exception e) {
+			InvalidClassException ice = new InvalidClassException("Cannot instanciate object from class " + typeModel.getJavaType().getName());
+			ice.initCause(e);
+			throw ice;
+		}
+	}
+	
+	protected <O> O instanciate(int id, DataContainer container, ClassTypeModel<O> typeModel) throws IOException {
+		Map<FieldModel<? super O, ?>, Object> state = new HashMap<FieldModel<? super O,?>, Object>();
+		ClassTypeModel<? super O> currentTypeModel = typeModel;
+		List<FieldUpdate<O>> sets = new ArrayList<ObjectReader.FieldUpdate<O>>();
+		while(currentTypeModel != null) {
+			for(FieldModel<? super O, ?> fieldModel : currentTypeModel.getFields()) {
+				if(!fieldModel.isTransient()) {
+					switch (container.readInt()) {
+						case DataKind.NULL_VALUE:
+							state.put(fieldModel, null);
+							break;
+						case DataKind.OBJECT_REF:
+							int refId = container.readInt();
+							Object refO = idToObject.get(refId);
+							if(refO != null) {
+								state.put(fieldModel, refO);
+							} else {
+								sets.add(new FieldUpdate<O>(refId, fieldModel));
+							}
+							break;
+						case DataKind.OBJECT:
+							break;
+					}
+				}
+			}
+			
+			currentTypeModel = currentTypeModel.getSuperType();
+		}
+		
+		O instance = instantiate(typeModel, state);
+		
+		return instance;
 	}
 	
 	@Override
