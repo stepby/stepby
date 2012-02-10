@@ -21,16 +21,20 @@ package org.exoplatform.commons.serialization.serial;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InvalidClassException;
+import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
+import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.exoplatform.commons.serialization.SerializationContext;
+import org.exoplatform.commons.serialization.api.TypeConverter;
 import org.exoplatform.commons.serialization.api.factory.ObjectFactory;
 import org.exoplatform.commons.serialization.model.ClassTypeModel;
+import org.exoplatform.commons.serialization.model.ConvertedTypeModel;
 import org.exoplatform.commons.serialization.model.FieldModel;
 
 /**
@@ -67,10 +71,11 @@ public class ObjectReader extends ObjectInputStream {
 		}
 	}
 	
-	protected <O> O instanciate(int id, DataContainer container, ClassTypeModel<O> typeModel) throws IOException {
+	protected <O> O instantiate(int id, DataContainer container, ClassTypeModel<O> typeModel) throws IOException {
 		Map<FieldModel<? super O, ?>, Object> state = new HashMap<FieldModel<? super O,?>, Object>();
 		ClassTypeModel<? super O> currentTypeModel = typeModel;
 		List<FieldUpdate<O>> sets = new ArrayList<ObjectReader.FieldUpdate<O>>();
+		
 		while(currentTypeModel != null) {
 			for(FieldModel<? super O, ?> fieldModel : currentTypeModel.getFields()) {
 				if(!fieldModel.isTransient()) {
@@ -88,22 +93,98 @@ public class ObjectReader extends ObjectInputStream {
 							}
 							break;
 						case DataKind.OBJECT:
+							Object o = container.readObject();
+							state.put(fieldModel, o);
 							break;
 					}
 				}
 			}
-			
 			currentTypeModel = currentTypeModel.getSuperType();
 		}
 		
 		O instance = instantiate(typeModel, state);
 		
+		for(FieldUpdate<O> set : sets) {
+			List<FutureFieldUpdate<?>> resolutions = idToResolutions.get(set.ref);
+			if(resolutions == null) {
+				resolutions = new ArrayList<FutureFieldUpdate<?>>();
+				idToResolutions.put(set.ref, resolutions);
+			}
+			resolutions.add(new FutureFieldUpdate<O>(instance, set.fieldModel));
+		}
+		
+		idToObject.put(id, instance);
+		List<FutureFieldUpdate<?>> resolutions = idToResolutions.remove(id);
+		if(resolutions != null) {
+			for(FutureFieldUpdate<?> resolution : resolutions) {
+				resolution.fieldModel.castAndSet(resolution.target, instance);
+			}
+		}
+		
 		return instance;
+	}
+	
+	private Object read(DataContainer container) throws IOException {
+		int sw = container.readInt();
+		switch (sw) {
+			case DataKind.OBJECT_REF :
+			{
+				int id = container.readInt();
+				Object o1 = idToObject.get(id);
+				if(o1 == null) throw new AssertionError();
+				return o1;
+			}
+			case DataKind.OBJECT :
+			{
+				int id = container.readInt();
+				Class<?> clazz = (Class<?>)container.readObject();
+				ClassTypeModel<?> classTypeModel = (ClassTypeModel<?>)context.getTypeDomain().getTypeModel(clazz);
+				return instantiate(id, container, classTypeModel);
+			}
+			case DataKind.CONVERTED_OBJECT :
+			{
+				Class<?> clazz = (Class<?>)container.readObject();
+				ConvertedTypeModel<?, ?> ctm = (ConvertedTypeModel<?, ?>)context.getTypeDomain().getTypeModel(clazz);
+				return convertObject(container, ctm);
+			}
+			case DataKind.SERIALIZED_OBJECT :
+				return container.readObject();
+			default :
+				throw new StreamCorruptedException("Unrecoginzed data " + sw);
+		}
+	}
+	
+	private <O, T> O convertObject(DataContainer container, ConvertedTypeModel<O, T> convertedType) throws IOException {
+		Object inner = resolveObject(container);
+		T t = convertedType.getTargetType().getJavaType().cast(inner);
+		
+		TypeConverter<O, T> converter;
+		try{
+			converter = convertedType.getConverterJavaType().newInstance();
+		} catch(Exception e) {
+			throw new AssertionError(e);
+		}
+		
+		O o = null;
+		try {
+			o = converter.read(t);
+		} catch(Exception e) {
+			InvalidObjectException ioe = new InvalidObjectException("The object " + t + " conversion throw an exception " + converter);
+			ioe.initCause(e);
+			throw ioe;
+		}
+		
+		if(o == null) 
+			throw new InvalidObjectException("The object " + t + " was converted to null by converter " + converter);
+		
+		return o;
 	}
 	
 	@Override
 	protected Object resolveObject(Object obj) throws IOException {
-		return null;
+		if(obj instanceof DataContainer) {
+			return read((DataContainer)obj);
+		} else return obj;
 	}
 	
 	@Override

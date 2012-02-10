@@ -129,11 +129,4 @@ public class HTMLEntityEncoder extends EntityEncoder {
 		}
 		return array;
 	}
-	
-	public static void main(String[] args) throws Exception {
-		 Writer sw = new StringWriter();
-		 CharWriter charWriter = new WriterCharWriter(sw);
-		getInstance().safeEncode("/a/b/c/d".toCharArray(), 0, 8, charWriter, IMMUNE_HTML);
-		System.out.println(sw.toString());
-	}
 }

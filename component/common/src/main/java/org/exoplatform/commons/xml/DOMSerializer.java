@@ -122,13 +122,13 @@ public class DOMSerializer {
 	
 	private static void writeTextData(XMLStreamWriter writer, String data) throws XMLStreamException {
 		StringBuilder b = new StringBuilder();
-		
 		for(int i = 0; i < data.length(); i++) {
 			char c = data.charAt(i);
 			String encodedValue = HTMLEntityEncoder.getInstance().lookupEntityName(c);
 			if(encodedValue == null) b.append(c);
 			else b.append(encodedValue);
-			writer.writeCharacters(b.toString());
 		}
+		
+		writer.writeCharacters(b.toString());
 	}
 }
