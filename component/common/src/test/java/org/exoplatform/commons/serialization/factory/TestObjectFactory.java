@@ -16,15 +16,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.commons.xml;
+package org.exoplatform.commons.serialization.factory;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
+import org.exoplatform.commons.serialization.SerializationContext;
+import org.exoplatform.commons.serialization.model.TypeDomain;
 
 import junit.framework.TestCase;
 
@@ -33,20 +28,16 @@ import junit.framework.TestCase;
  * @version $Id$
  *
  */
-public class TestDomSerializer extends TestCase {
-	
-	public void testWithCDATA() throws Exception {
-		assertSerialization("<content><![CDATA[Hello > world]]></content>", "<content><![CDATA[Hello > world]]></content>");
-	}
-	
-	public void testWithText() throws Exception {
-		assertSerialization("<content>foo &copy; bar</content>", "<content>foo © bar</content>");
-	}
+public class TestObjectFactory extends TestCase {
 
-	private void assertSerialization(String expectedMarkup, String markup) throws Exception {
-		Element elt = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(markup))).getDocumentElement() ;
-		StringWriter writer = new StringWriter();
-		DOMSerializer.serialize(elt, writer);
-		assertEquals(expectedMarkup, writer.toString());
+	public void testCustomFactory() throws Exception {
+		TypeDomain typeDomain = new TypeDomain();
+		typeDomain.addTypeModel(A.class);
+		SerializationContext context = new SerializationContext(typeDomain);
+		context.addFactory(new CustomFactory());
+		
+		A a = new A();
+		A clone = context.clone(a);
+		assertSame(CustomFactory.instance, clone);
 	}
 }

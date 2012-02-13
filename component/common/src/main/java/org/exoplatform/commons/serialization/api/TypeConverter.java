@@ -23,9 +23,9 @@ package org.exoplatform.commons.serialization.api;
  * @version $Id$
  *
  */
-public abstract class TypeConverter<I, O> {
+public abstract class TypeConverter<E, I> {
 
-	public abstract O write(I inputClass) throws Exception;
+	public abstract I write(E inputClass) throws Exception;
 	
-	public abstract I read(O outputClass) throws Exception;
+	public abstract E read(I outputClass) throws Exception;
 }

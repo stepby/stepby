@@ -50,7 +50,7 @@ public class ObjectReader extends ObjectInputStream {
 	
 	private final Map<Integer, List<FutureFieldUpdate<?>>> idToResolutions;
 	
-	protected ObjectReader(SerializationContext context, InputStream in) throws IOException, SecurityException {
+	public ObjectReader(SerializationContext context, InputStream in) throws IOException, SecurityException {
 		super(in);
 		
 		enableResolveObject(true);

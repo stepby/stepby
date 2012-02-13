@@ -74,12 +74,14 @@ public class DOMSerializer {
 	private static void serialize(Element element, XMLStreamWriter writer) throws IOException, XMLStreamException {
 		String tagName = element.getTagName();
 		boolean empty;
+		
 		if(tagName.equalsIgnoreCase("script")) {
 			empty= false;
 		} else {
 			empty = true;
 			NodeList children = element.getChildNodes();
 			int length = children.getLength();
+			
 			for(int i = 0; i < length && empty; i++) {
 				Node child = children.item(i);
 				if(child instanceof CharacterData) {
@@ -90,8 +92,10 @@ public class DOMSerializer {
 			}
 		}
 		
-		if(empty) writer.writeEmptyElement(tagName);
-		else writer.writeStartElement(tagName);
+		if(empty) 
+			writer.writeEmptyElement(tagName);
+		else 
+			writer.writeStartElement(tagName);
 		
 		if(element.hasAttributes()) {
 			NamedNodeMap attrs = element.getAttributes();
@@ -115,9 +119,9 @@ public class DOMSerializer {
 					serialize((Element) child, writer);
 				}
 			}
+			
+			writer.writeEndElement();
 		}
-		
-		writer.writeEndElement();
 	}
 	
 	private static void writeTextData(XMLStreamWriter writer, String data) throws XMLStreamException {

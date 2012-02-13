@@ -75,7 +75,7 @@ class TypeModelBuilder {
 	
 	private <O> ClassTypeModel<O> buildClassType(Class<O> javaType, ClassTypeMetaData typeMetaData) {
 		ClassTypeModel<? super O> superTypeModel = null;
-		
+
 		if(javaType.getSuperclass() != null) {
 			TypeModel<? super O> buildType = build(javaType.getSuperclass());
 			if(buildType instanceof ClassTypeModel) {
@@ -86,7 +86,9 @@ class TypeModelBuilder {
 		}
 		
 		TreeMap<String, FieldModel<O, ?>> fieldModels = new TreeMap<String, FieldModel<O,?>>();
+		
 		SerializationMode serializationMode;
+		
 		if(typeMetaData.isSerialized()) {
 			serializationMode = SerializationMode.SERIALIZED;
 		} else if(Serializable.class.isAssignableFrom(javaType)) {

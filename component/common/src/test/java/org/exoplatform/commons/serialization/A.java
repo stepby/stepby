@@ -16,38 +16,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.commons.serialization.model;
+package org.exoplatform.commons.serialization;
+
+import org.exoplatform.commons.serialization.api.annotations.Serialized;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
  * @version $Id$
  *
  */
-public abstract class TypeModel<O> {
+@Serialized
+public class A {
 
-	private final Class<O> javaType;
-	
-	private final TypeModel<? super O> superType;
-	
-	TypeModel(Class<O> javaType, TypeModel<? super O> superType) {
-		this.javaType = javaType;
-		this.superType = superType;
-	}
-	
-	public String getName() {
-		return javaType.getName();
-	}
-	
-	public Class<O> getJavaType() {
-		return javaType;
-	}
-	
-	public TypeModel<? super O> getSuperType() {
-		return superType;
-	}
-	
-	@Override
-	public String toString() {
-		return "TypeModel[name = " + javaType.getName() + "]";
-	}
 }

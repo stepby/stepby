@@ -16,38 +16,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.commons.serialization.model;
+package org.exoplatform.commons.serialization;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
  * @version $Id$
  *
  */
-public abstract class TypeModel<O> {
+public class SetBuilder<E> {
 
-	private final Class<O> javaType;
+	private final Set<E> set = new HashSet<E>();
 	
-	private final TypeModel<? super O> superType;
-	
-	TypeModel(Class<O> javaType, TypeModel<? super O> superType) {
-		this.javaType = javaType;
-		this.superType = superType;
+	public static <E> SetBuilder<E> create(E element) {
+		return new SetBuilder<E>().with(element);
 	}
 	
-	public String getName() {
-		return javaType.getName();
+	public SetBuilder<E> with(E element) {
+		set.add(element);
+		return this;
 	}
 	
-	public Class<O> getJavaType() {
-		return javaType;
-	}
-	
-	public TypeModel<? super O> getSuperType() {
-		return superType;
-	}
-	
-	@Override
-	public String toString() {
-		return "TypeModel[name = " + javaType.getName() + "]";
+	public Set<E> build(E element) {
+		set.add(element);
+		return set;
 	}
 }

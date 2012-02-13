@@ -49,7 +49,7 @@ public class ObjectWriter extends ObjectOutputStream {
 	
 	private final IdentityHashMap<Object, Integer> objectToId;
 
-	protected ObjectWriter(SerializationContext context, OutputStream out) throws IOException, SecurityException {
+	public ObjectWriter(SerializationContext context, OutputStream out) throws IOException, SecurityException {
 		super(out);
 		
 		enableReplaceObject(true);
@@ -65,8 +65,8 @@ public class ObjectWriter extends ObjectOutputStream {
 	}
 	
 	private <O> void write(ClassTypeModel<O> typeModel, Object obj, DataContainer output) throws IOException {
-		if(typeModel.getSerializationMode() == SerializationMode.SERIALIZABLE) {
-			
+		
+		if(typeModel.getSerializationMode() == SerializationMode.SERIALIZED) {
 			output.writeInt(DataKind.OBJECT);
 			output.writeInt(register(obj));
 			output.writeObject(typeModel.getJavaType());
@@ -74,7 +74,7 @@ public class ObjectWriter extends ObjectOutputStream {
 			SerializationStatus status = SerializationStatus.NONE;
 			for(ClassTypeModel<? super O> currentTypeModel = typeModel; 
 						currentTypeModel != null; 
-						currentTypeModel = typeModel.getSuperType()) {
+						currentTypeModel = currentTypeModel.getSuperType()) {
 				
 				if(currentTypeModel instanceof ClassTypeModel<?>) {
 					

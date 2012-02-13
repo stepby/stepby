@@ -16,38 +16,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.commons.serialization.model;
+package org.exoplatform.commons.serialization.factory;
+
+import java.util.Map;
+
+import org.exoplatform.commons.serialization.api.factory.CreateException;
+import org.exoplatform.commons.serialization.api.factory.ObjectFactory;
+import org.exoplatform.commons.serialization.model.FieldModel;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
  * @version $Id$
  *
  */
-public abstract class TypeModel<O> {
+public class CustomFactory extends ObjectFactory<A> {
 
-	private final Class<O> javaType;
-	
-	private final TypeModel<? super O> superType;
-	
-	TypeModel(Class<O> javaType, TypeModel<? super O> superType) {
-		this.javaType = javaType;
-		this.superType = superType;
-	}
-	
-	public String getName() {
-		return javaType.getName();
-	}
-	
-	public Class<O> getJavaType() {
-		return javaType;
-	}
-	
-	public TypeModel<? super O> getSuperType() {
-		return superType;
-	}
+	static A instance = new A();
 	
 	@Override
-	public String toString() {
-		return "TypeModel[name = " + javaType.getName() + "]";
+	public <S extends A> S create(Class<S> type, Map<FieldModel<? super S, ?>, ?> state) throws CreateException {
+		if(type == A.class) {
+			return type.cast(instance);
+		}
+		throw new CreateException();
 	}
 }

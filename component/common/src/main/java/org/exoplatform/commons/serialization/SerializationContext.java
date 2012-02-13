@@ -18,6 +18,11 @@
  */
 package org.exoplatform.commons.serialization;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +30,8 @@ import java.util.Map;
 import org.exoplatform.commons.serialization.api.factory.DefaultObjectFactory;
 import org.exoplatform.commons.serialization.api.factory.ObjectFactory;
 import org.exoplatform.commons.serialization.model.TypeDomain;
+import org.exoplatform.commons.serialization.serial.ObjectReader;
+import org.exoplatform.commons.serialization.serial.ObjectWriter;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
@@ -68,4 +75,40 @@ public class SerializationContext {
 		
 		return factory;
 	}
+	
+	public <O> O clone(O o) throws IOException, ClassNotFoundException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ObjectWriter writer = new ObjectWriter(this, baos);
+		writer.writeObject(o);
+		writer.close();
+		ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+		ObjectReader reader = new ObjectReader(this, bais);
+		return (O)reader.readObject();
+	}
+	
+	public void write(Object o, OutputStream out) throws IOException {
+		ObjectWriter writer = new ObjectWriter(this, out);
+		writer.writeObject(o);
+		writer.flush();
+	}
+	
+	public byte[] write(Object o) throws IOException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ObjectWriter writer = new ObjectWriter(this, out);
+		writer.writeObject(o);
+		writer.close();
+		return out.toByteArray();
+	}
+	
+	public Object read(byte[] bytes) throws IOException, ClassNotFoundException {
+		ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+		ObjectReader reader = new ObjectReader(this, in);
+		return reader.readObject();
+	}
+	
+	public Object read(InputStream in) throws IOException, ClassNotFoundException {
+		ObjectReader reader = new ObjectReader(this, in);
+		return reader.readObject();
+	}
 }
+

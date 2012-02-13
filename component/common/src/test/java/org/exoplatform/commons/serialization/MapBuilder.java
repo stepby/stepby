@@ -16,38 +16,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.commons.serialization.model;
+package org.exoplatform.commons.serialization;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
  * @version $Id$
  *
  */
-public abstract class TypeModel<O> {
+public class MapBuilder<K, V> {
 
-	private final Class<O> javaType;
+	private final Map<K, V> map = new HashMap<K, V>();
 	
-	private final TypeModel<? super O> superType;
-	
-	TypeModel(Class<O> javaType, TypeModel<? super O> superType) {
-		this.javaType = javaType;
-		this.superType = superType;
+	public static <K, V> MapBuilder<K, V> create(K key, V value) {
+		return new MapBuilder<K, V>().with(key, value);
 	}
 	
-	public String getName() {
-		return javaType.getName();
+	public MapBuilder<K, V> with(K key, V value) {
+		map.put(key, value);
+		return this;
 	}
 	
-	public Class<O> getJavaType() {
-		return javaType;
-	}
-	
-	public TypeModel<? super O> getSuperType() {
-		return superType;
-	}
-	
-	@Override
-	public String toString() {
-		return "TypeModel[name = " + javaType.getName() + "]";
+	public Map<K, V> build(K key, V value) {
+		map.put(key, value);
+		return map;
 	}
 }
