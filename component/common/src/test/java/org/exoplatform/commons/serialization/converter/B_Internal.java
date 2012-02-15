@@ -16,19 +16,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.commons.serialization;
+package org.exoplatform.commons.serialization.converter;
 
-import org.exoplatform.commons.serialization.api.annotations.Serialized;
+import java.io.Serializable;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
  * @version $Id$
  *
  */
-@Serialized
-public class A {
+public class B_Internal implements Serializable {
 
-	String a;
-	int b;
-	boolean c;
+	String state;
+	
+	public B_Internal() {
+	
+	}
+	
+	public B_Internal(String state) {
+		this.state = state;
+	}
 }

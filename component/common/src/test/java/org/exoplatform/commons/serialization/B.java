@@ -26,9 +26,15 @@ import org.exoplatform.commons.serialization.api.annotations.Serialized;
  *
  */
 @Serialized
-public class A {
-
-	String a;
-	int b;
-	boolean c;
+public class B {
+	
+	B ref;
+	
+	public B(B ref) {
+		this.ref = ref;
+	}
+	
+	public B() {
+		
+	}
 }

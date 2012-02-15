@@ -34,5 +34,5 @@ import org.exoplatform.commons.serialization.api.TypeConverter;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Converted {
 	
-	Class<? extends TypeConverter<?, ?>> values();
+	Class<? extends TypeConverter<?, ?>> value();
 }

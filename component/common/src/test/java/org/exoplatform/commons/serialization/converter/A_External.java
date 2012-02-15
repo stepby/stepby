@@ -16,19 +16,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.commons.serialization;
+package org.exoplatform.commons.serialization.converter;
 
-import org.exoplatform.commons.serialization.api.annotations.Serialized;
+import org.exoplatform.commons.serialization.api.annotations.Converted;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
  * @version $Id$
  *
  */
-@Serialized
-public class A {
-
-	String a;
-	int b;
-	boolean c;
+@Converted(A_Converter.class)
+public class A_External {
+	
+	String state;
+	
+	public A_External() {
+	
+	}
+	
+	public A_External(String state) {
+		this.state = state;
+	}
 }

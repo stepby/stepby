@@ -16,19 +16,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.commons.serialization;
+package org.exoplatform.commons.serialization.converter;
 
-import org.exoplatform.commons.serialization.api.annotations.Serialized;
+import junit.framework.AssertionFailedError;
+
+import org.exoplatform.commons.serialization.api.TypeConverter;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
  * @version $Id$
  *
  */
-@Serialized
-public class A {
+public class A_Converter extends TypeConverter<A_External, A_Internal> {
 
-	String a;
-	int b;
-	boolean c;
+	public static TypeConverter<A_External, A_Internal> delegate;
+	
+	@Override
+	public A_Internal write(A_External input) throws Exception {
+		if(delegate == null) throw new AssertionFailedError();
+		return delegate.write(input);
+	}
+
+	@Override
+	public A_External read(A_Internal output) throws Exception {
+		if(delegate == null) throw new AssertionFailedError();
+		return delegate.read(output);
+	}
 }

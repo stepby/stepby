@@ -26,9 +26,8 @@ import org.exoplatform.commons.serialization.api.annotations.Serialized;
  *
  */
 @Serialized
-public class A {
-
+public class G {
+	
 	String a;
-	int b;
-	boolean c;
+	transient Thread b;	
 }

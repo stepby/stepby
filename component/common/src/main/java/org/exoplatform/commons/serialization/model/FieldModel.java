@@ -83,12 +83,12 @@ public final class FieldModel<O, V> {
 	}
 	
 	public void castAndSet(Object o, Object value) {
-		V v = type.getJavaType().cast(o);
+		V v = type.getJavaType().cast(value);
 		set(o, v);
 	}
 	
 	@Override
 	public String toString() {
-		return "FieldName=[name = " + field.getName() + ", owner = " + owner + "]";
+		return "FieldModel[name = " + field.getName() + ", owner = " + owner + "]";
 	}
 }

@@ -16,19 +16,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.commons.serialization;
+package org.exoplatform.commons.serialization.converter;
 
-import org.exoplatform.commons.serialization.api.annotations.Serialized;
+import org.exoplatform.commons.serialization.api.TypeConverter;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
  * @version $Id$
  *
  */
-@Serialized
-public class A {
+public class B_Converter extends TypeConverter<B_External, B_Internal> {
 
-	String a;
-	int b;
-	boolean c;
+	@Override
+	public B_Internal write(B_External input) throws Exception {
+		return new B_Internal(input.state);
+	}
+
+	@Override
+	public B_External read(B_Internal output) throws Exception {
+		return new B_External(output.state);
+	}
 }

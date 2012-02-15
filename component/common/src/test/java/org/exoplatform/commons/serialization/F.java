@@ -18,6 +18,9 @@
  */
 package org.exoplatform.commons.serialization;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.exoplatform.commons.serialization.api.annotations.Serialized;
 
 /**
@@ -26,9 +29,8 @@ import org.exoplatform.commons.serialization.api.annotations.Serialized;
  *
  */
 @Serialized
-public class A {
-
-	String a;
-	int b;
-	boolean c;
+public class F {
+	List<F> children = new ArrayList<F>();
+	
+	F parent;
 }

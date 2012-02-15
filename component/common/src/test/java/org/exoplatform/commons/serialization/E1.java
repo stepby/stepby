@@ -26,9 +26,6 @@ import org.exoplatform.commons.serialization.api.annotations.Serialized;
  *
  */
 @Serialized
-public class A {
+public class E1 {
 
-	String a;
-	int b;
-	boolean c;
 }

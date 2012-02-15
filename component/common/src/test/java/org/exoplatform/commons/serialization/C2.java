@@ -18,17 +18,12 @@
  */
 package org.exoplatform.commons.serialization;
 
-import org.exoplatform.commons.serialization.api.annotations.Serialized;
-
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
  * @version $Id$
  *
  */
-@Serialized
-public class A {
+public class C2 extends C1 {
 
-	String a;
-	int b;
-	boolean c;
+	String a = "a2";
 }

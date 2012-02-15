@@ -18,6 +18,8 @@
  */
 package org.exoplatform.commons.serialization.factory;
 
+import java.io.InvalidClassException;
+
 import org.exoplatform.commons.serialization.SerializationContext;
 import org.exoplatform.commons.serialization.model.TypeDomain;
 
@@ -39,5 +41,17 @@ public class TestObjectFactory extends TestCase {
 		A a = new A();
 		A clone = context.clone(a);
 		assertSame(CustomFactory.instance, clone);
+	}
+	
+	public void testFactoryThrowException() throws Exception {
+		TypeDomain typeDomain = new TypeDomain();
+		typeDomain.addTypeModel(B.class);
+		SerializationContext context = new SerializationContext(typeDomain);
+		B b = new B(false);
+		try {
+			context.clone(b);
+			fail();
+		} catch (InvalidClassException e) {
+		}
 	}
 }

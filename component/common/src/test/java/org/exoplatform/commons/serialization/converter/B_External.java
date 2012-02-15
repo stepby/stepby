@@ -16,31 +16,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.commons.serialization;
+package org.exoplatform.commons.serialization.converter;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.exoplatform.commons.serialization.api.annotations.Converted;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
  * @version $Id$
  *
  */
-public class MapBuilder<K, V> {
-
-	private final Map<K, V> map = new HashMap<K, V>();
+@Converted(B_Converter.class)
+public class B_External {
 	
-	public static <K, V> MapBuilder<K, V> create(K key, V value) {
-		return new MapBuilder<K, V>().with(key, value);
+	String state;
+	
+	public B_External() {
+	
 	}
 	
-	public MapBuilder<K, V> with(K key, V value) {
-		map.put(key, value);
-		return this;
-	}
-	
-	public Map<K, V> build(K key, V value) {
-		map.put(key, value);
-		return map;
+	public B_External(String state) {
+		this.state = state;
 	}
 }

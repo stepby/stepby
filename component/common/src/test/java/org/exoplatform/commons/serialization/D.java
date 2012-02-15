@@ -18,29 +18,16 @@
  */
 package org.exoplatform.commons.serialization;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.exoplatform.commons.serialization.api.annotations.Serialized;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
  * @version $Id$
  *
  */
-public class SetBuilder<E> {
+@Serialized
+public class D {
 
-	private final Set<E> set = new HashSet<E>();
-	
-	public static <E> SetBuilder<E> create(E element) {
-		return new SetBuilder<E>().with(element);
-	}
-	
-	public SetBuilder<E> with(E element) {
-		set.add(element);
-		return this;
-	}
-	
-	public Set<E> build(E element) {
-		set.add(element);
-		return set;
-	}
+	static String a = "a";
+	String b = "b";
 }

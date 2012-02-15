@@ -187,7 +187,7 @@ class TypeModelBuilder {
 				if(converted != null) throw new TypeException();
 				typeMetaData = new ClassTypeMetaData(javaType.getName(), true);
 			} else if(converted != null) {
-				typeMetaData = new ConvertedTypeMetaData(javaType.getName(), converted.values());
+				typeMetaData = new ConvertedTypeMetaData(javaType.getName(), converted.value());
 			} else {
 				typeMetaData = new ClassTypeMetaData(javaType.getName(), false);
 			}
