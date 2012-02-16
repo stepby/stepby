@@ -54,13 +54,13 @@
         </value-param>
         <value-param>
           <name>class-name</name>
-          <value>java.sql.DataSource</value>
+          <value>javax.sql.DataSource</value>
         </value-param>
         <value-param>
           <name>factory</name>
-          <value>org.apache.commons.dhcp.BasicDataSourceFactory</value>
+          <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
         </value-param>
-        <properties-param profile="hsqldb">
+        <properties-param profiles="hsqldb">
           <name>ref-addresses</name>
           <description>ref-addresses</description>
           <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
@@ -78,5 +78,6 @@
         </properties-param>
       </init-params>
     </component-plugin>
-  </external-component-plugins> 
+  </external-component-plugins>
+  
 </configuration>
