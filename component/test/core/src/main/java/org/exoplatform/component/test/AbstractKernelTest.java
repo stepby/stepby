@@ -18,12 +18,14 @@
  */
 package org.exoplatform.component.test;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import junit.framework.TestSuite;
 
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 
@@ -33,48 +35,57 @@ import org.exoplatform.container.component.RequestLifeCycle;
  *
  */
 public class AbstractKernelTest extends AbstractGateInTest {
-	
+
 	private static KernelBootstrap bootstrap;
-	
+
 	private static final Map<Class<?>, AtomicLong> counters = new HashMap<Class<?>, AtomicLong>();
-	
+
 	protected AbstractKernelTest() {
 		super();
 	}
-	
+
 	protected AbstractKernelTest(String name) {
 		super(name);
 	}
-	
+
 	public PortalContainer getContainer() {
 		return bootstrap != null ? bootstrap.getContainer() : null;
 	}
-	
+
 	protected void begin() {
 		RequestLifeCycle.begin(getContainer());
 	}
-	
+
 	protected void end() {
 		RequestLifeCycle.end();
 	}
-	
+
 	@Override
 	protected void beforeRunBare() throws Exception {
-		Class<?> key = getClass();
+		//Check to run on eclipse
+		if(PropertyManager.getProperty("exo.profiles") == null) {
+			PropertyManager.setProperty("exo.profiles", "hsqldb");
+		}
+
+		if(System.getProperty("basedir") == null) {
+			System.setProperty("basedir", System.getProperty("user.dir"));
+		}
+		//
 		
+		Class<?> key = getClass();
+
 		if(!counters.containsKey(key)) {
 			counters.put(key, new AtomicLong(new TestSuite(getClass()).testCount()));
-			
+
 			bootstrap = new KernelBootstrap(Thread.currentThread().getContextClassLoader());
 			bootstrap.addConfiguration(getClass());
 			bootstrap.boot();
 		}
 	}
-	
+
 	@Override
 	protected void afterRunBare() {
 		Class<?> key = getClass();
-		
 		if(counters.get(key).decrementAndGet() == 0) {
 			bootstrap.dispose();
 			bootstrap = null;

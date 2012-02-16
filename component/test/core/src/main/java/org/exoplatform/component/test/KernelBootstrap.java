@@ -20,6 +20,7 @@ package org.exoplatform.component.test;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -64,8 +65,7 @@ public class KernelBootstrap {
 		configs.put(ContainerScope.ROOT, rootConfigPaths);
 		configs.put(ContainerScope.PORTAL, portalConfigPaths);
 		
-		String basedir = System.getProperty("basedir") != null ? System.getProperty("basedir") : "./" ;
-		File targetDir = new File(new File(basedir), "target");
+		File targetDir = new File(new File(System.getProperty("basedir")), "target");
 		if(!targetDir.exists()) {
 			throw new AssertionFailedError("Target dir for unit test does not exist");
 		} 

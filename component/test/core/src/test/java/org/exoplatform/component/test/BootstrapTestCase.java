@@ -18,6 +18,11 @@
  */
 package org.exoplatform.component.test;
 
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.util.Map;
+
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
@@ -50,5 +55,43 @@ public class BootstrapTestCase extends AbstractKernelTest {
 		container.getComponentInstanceOfType(InitialContextInitializer.class);
 		DataSource ds = (DataSource)new InitialContext().lookup("jdbcexo");
 		assertNotNull(ds);
+		
+		Connection conn = ds.getConnection();
+		assertNotNull(conn);
+		
+		DatabaseMetaData databaseMD = conn.getMetaData();
+		assertNotNull(databaseMD);
+		
+		String db = databaseMD.getDatabaseProductName() + " " + databaseMD.getDatabaseProductVersion() + "."
+					+ databaseMD.getDatabaseMajorVersion() + "." + databaseMD.getDatabaseMinorVersion();
+		
+		String driver = databaseMD.getDriverName() + " " + databaseMD.getDriverVersion() + "." 
+					+ databaseMD.getDriverMajorVersion() + "." + databaseMD.getDriverMinorVersion();
+		log.info("Using database " + db + " with driver " + driver);
+	}
+	
+	public void testTmpDir1() throws Exception {
+		ensureTmpDir();
+	}
+	
+	public void testTmpDir2() throws Exception {
+		ensureTmpDir();
+	}
+	
+	private void ensureTmpDir() throws Exception {
+		
+		String tmpDirPath = System.getProperty("gatein.test.tmp.dir");
+      assertNotNull(tmpDirPath);
+      
+      if(previousTmpDirPath != null) {
+      	assertEquals(previousTmpDirPath, tmpDirPath);
+      } else {
+      	previousTmpDirPath = tmpDirPath;
+      }
+      
+      File f = new File(tmpDirPath);
+      assertTrue(f.exists());
+      assertTrue(f.isDirectory());
+      assertTrue(f.canWrite());
 	}
 }
