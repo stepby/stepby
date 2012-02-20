@@ -27,4 +27,43 @@ import java.io.Serializable;
  */
 public class ScopedKey<S extends Serializable> extends AbstractScopedKey {
 
+	private final S key;
+	
+	public static <S extends Serializable> ScopedKey<S> create(S key) throws NullPointerException {
+		return new ScopedKey<S>(key);
+	}
+	
+	public static <S extends Serializable> ScopedKey<S> create(String scope, S key) throws NullPointerException {
+		return new ScopedKey<S>(scope, key);
+	}
+	
+	public ScopedKey(S key) throws NullPointerException {
+		if(key == null) throw new NullPointerException();
+		this.key = key;
+	}
+	
+	public ScopedKey(String scope, S key) throws NullPointerException {
+		super(scope);
+		if(key == null) throw new NullPointerException();
+		this.key = key;
+	}
+	
+	public S getKey() {
+		return key;
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode() ^ key.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj) && ((ScopedKey)obj).key.equals(key);
+	}
+	
+	@Override
+	public String toString() {
+		return "ScopedKey[scope=" + getScope() + ", key=" + key + "]";
+	}
 }

@@ -18,8 +18,12 @@
  */
 package org.exoplatform.commons.scope;
 
+import javax.jcr.RepositoryException;
+
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
+import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 
@@ -34,7 +38,7 @@ public class ScopeManager implements ComponentRequestLifecycle {
 	
 	private static final ThreadLocal<String> currentScope = new ThreadLocal<String>();
 	
-	public String getCurrentScope() {
+	public static String getCurrentScope() {
 		return currentScope.get();
 	}
 
@@ -43,10 +47,32 @@ public class ScopeManager implements ComponentRequestLifecycle {
 		if(currentScope.get() != null) {
 			throw new IllegalStateException("Detected scope reentrancy " + currentScope.get());
 		}
+		
+		RepositoryService repoService = (RepositoryService)container.getComponentInstanceOfType(RepositoryService.class);
+		String scope = null;
+		if(repoService != null) {
+			try {
+				ManageableRepository currentRepo = repoService.getCurrentRepository();
+				scope = currentRepo.getConfiguration().getName();
+			} catch(RepositoryException e) {
+				log.error("Could not obtain scope value from repository", e);
+			}
+		}
+		
+		if(scope == null) {
+			scope = "";
+		}
+		
+		currentScope.set(scope);
+		log.debug("Start scope request\"" + scope + "\"");
 	}
 
 	@Override
 	public void endRequest(ExoContainer container) {
+		if(currentScope.get() == null) {
+			throw new IllegalStateException("Detected unscoped unscoping");
+		}
 		
+		currentScope.set(null);
 	}
 }

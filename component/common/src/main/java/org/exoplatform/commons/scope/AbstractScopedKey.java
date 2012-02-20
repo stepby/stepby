@@ -27,4 +27,35 @@ import java.io.Serializable;
  */
 public abstract class AbstractScopedKey implements Serializable {
 
+	private final String scope;
+	
+	protected AbstractScopedKey() {
+		String scope = ScopeManager.getCurrentScope();
+		if(scope == null) scope = "";
+		this.scope = scope;
+	}
+	
+	protected AbstractScopedKey(String scope) throws NullPointerException {
+		if(scope == null) throw new NullPointerException();
+		this.scope = scope;
+	}
+	
+	public final String getScope() {
+		return scope;
+	}
+	
+	@Override
+	public int hashCode() {
+		return scope.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == this) return true;
+		if(obj instanceof AbstractScopedKey) {
+			AbstractScopedKey that = (AbstractScopedKey)obj;
+			return getClass().equals(that.getClass()) && scope.equals(that.scope);
+		}
+		return false;
+	}
 }
