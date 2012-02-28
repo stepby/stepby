@@ -18,7 +18,6 @@
  */
 package org.exoplatform.component.test;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
