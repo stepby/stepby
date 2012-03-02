@@ -20,6 +20,7 @@ package org.exoplatform.commons.util;
 
 import java.util.AbstractQueue;
 import java.util.Iterator;
+import java.util.Queue;
 
 import org.gatein.common.xml.NoSuchElementException;
 
@@ -29,6 +30,14 @@ import org.gatein.common.xml.NoSuchElementException;
  *
  */
 public class Queues {
+	
+	public static <E> Queue<E> lifo() {
+		return lifo(10);
+	}
+	
+	public static <E> Queue<E> lifo(int initialCapacity) {
+		return new LIFO<E>(initialCapacity);
+	}
 
 	private static class LIFO<E> extends AbstractQueue<E> {
 		
