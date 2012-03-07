@@ -16,8 +16,12 @@
 
   <modules>
     <module>test</module>
-    <module>common</module>
-    <module>identity</module>
+		<module>common</module>
+		<module>resources</module>
+		<!--
+		<module>identity</module>
+		<module>pc</module>
+		-->
   </modules>
 
 </project>

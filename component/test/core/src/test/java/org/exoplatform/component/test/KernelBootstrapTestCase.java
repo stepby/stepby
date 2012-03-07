@@ -39,6 +39,7 @@ public class KernelBootstrapTestCase extends TestCase {
 		bootstrap.boot();
 		PortalContainer container2 = bootstrap.getContainer();
 		assertNotSame(container1, container2);
+		assertSame(container2, PortalContainer.getInstance());
 	}
 	
 	public void testGetTmpDir() {
