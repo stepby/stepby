@@ -1,0 +1,60 @@
+#{decorate path=main.gtmpl/}
+#{title value='Search'/}
+#{param name=bookings/}
+
+<h1>Search Hotels</h1>
+		
+<p>
+    <input type="text" class="search" size="30">
+    <input type="submit" class="submit" value="Find Hotels">
+    <input type="hidden" class="page" value="0">
+    <br>
+
+    Maximum results: 
+    <select class="size">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+    </select>
+</p>
+
+<div class="result">
+</div>
+
+<h1>Current Hotel Bookings</h1>
+
+<% if (bookings.empty) { %>
+    <p>
+        No Bookings Found
+    </p>
+<% } else { %>
+
+	<table>
+       <thead>
+           <tr>
+               <th>Name</th>
+               <th>Address</th>
+               <th>City, State</th>
+               <th>Check in</th>
+               <th>Check out</th>
+               <th>Confirmation number</th>
+               <th>Action</th>
+           </tr>
+       </thead>
+       <tbody>
+       		<% for (def booking : bookings ) { %>
+               <tr>
+                   <td>${booking.hotel.name}</td>
+                   <td>${booking.hotel.address}</td>
+                   <td>${booking.hotel.city}, ${booking.hotel.state}, ${booking.hotel.country}</td>
+                   <td>${booking.checkinDate}</td>
+                   <td>${booking.checkoutDate}</td>
+                   <td>${booking.id}</td>
+                   <td>
+                        <a href="@{Hotels.cancelBooking(id = booking.id)}">Cancel</a>
+                   </td>
+               </tr>
+           <% } %>
+       </tbody>
+   </table> 
+<% } %>
